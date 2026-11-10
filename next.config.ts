@@ -3,6 +3,7 @@ import path from "node:path";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  agentRules: false,
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {

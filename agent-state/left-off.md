@@ -1,8 +1,7 @@
 # left-off.md
 
 - Doing: 5-hour backend-first MVP, slices A-F in order.
-- Done: Slices A, B, and C. Slice C proved live on Bohr 968 (contract
-  0xdc7e...fb7e, split 2 paid exactly, evidence in deployments/968.json).
-- Next: Slice D frontend on the proven ABI (needs fresh session).
-- Issues: snapshot-ordering and payer-math bugs found and fixed during Slice C.
+- Done: Slices A, B, C, D. Slice D frontend proven in browser on Bohr 968 (create, share, pay).
+- Next: Slice E (QA, mobile polish, adversarial checks), then F (mainnet) only if gates pass.
+- Issues: signing in the browser journey used the local dev signer, not MetaMask. Do a real MetaMask pass in Slice E.
   Never force-push.

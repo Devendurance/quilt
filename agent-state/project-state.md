@@ -7,3 +7,6 @@
 - Slice A baseline done 2026-11-10. Slice B done: QuiltSplits (2-5 recipients, 10000 bps,
   nonReentrant atomic pay, dust rejection, no fees/admin) + 24 Hardhat tests green.
 - Next: Slice D frontend on the proven 968 contract (fresh session).
+- Slice D done: routes /, /create, /s/[splitId], /dashboard. wagmi injected connector, chain 968 only,
+  direct contract reads/simulate/write, no eth_getLogs (id from receipt logs), no DB.
+  Dev signer: scripts/dev-wallet.mjs, enabled only via NEXT_PUBLIC_DEV_WALLET_URL.
