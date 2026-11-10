@@ -1,0 +1,7 @@
+# memory.md
+
+- Remote https://github.com/Devendurance/quilt.git was empty at Slice A (ls-remote returned no refs).
+- Git identity present: Devendurance. Push still needs user auth; never force-push.
+- Chain facts verified: rpc.bohr.life = 968 (0x3c8), rpc.botchain.ai = 677 (0x2a5).
+- Conventions: fail closed on unset contract address; no NEXT_PUBLIC_ secrets; .fast-build/ not committed.
+- Frontend deps installed as structure only in Slice A; no Quilt UI built yet.
