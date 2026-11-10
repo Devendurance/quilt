@@ -1,6 +1,6 @@
 # contracts/
 
-Solidity backend for Quilt. Owned by Slice B (not yet implemented).
+Solidity backend for Quilt. Implemented in Slice B; tests in `test/` run green.
 
 - Implementation: `src/QuiltSplits.sol` (Slice B writes this; Slice A intentionally adds no contract code).
 - Tests: `test/` (unit + fuzz + reentrancy, Slice B).
