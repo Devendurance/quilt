@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Layers, Link2, ShieldCheck, Zap } from "lucide-react";
 import { HeroCapsule } from "@/components/HeroCapsule";
 import { LiveCount } from "@/components/LiveCount";
-import { CHAIN } from "@/lib/contract";
+import { CHAIN, WRITES_ENABLED } from "@/lib/contract";
 
 function Sphere({ className, style }: { className: string; style: React.CSSProperties }) {
   return (
@@ -60,7 +60,7 @@ export default function Home() {
               <Link href="/create" className="btn btn-primary">Create a split</Link>
               <Link href="/dashboard" className="btn btn-ghost">Your dashboard</Link>
             </div>
-            <p className="label mt-5 text-stone">{CHAIN.testnet ? `Live on ${CHAIN.name} (chain ${CHAIN.id}). Test BOT only.` : `Live on ${CHAIN.name}.`}</p>
+            <p className="label mt-5 text-stone">{!WRITES_ENABLED ? `${CHAIN.name} (chain ${CHAIN.id}). Read-only preview, payments aren't open yet.` : CHAIN.testnet ? `Live on ${CHAIN.name} (chain ${CHAIN.id}). Test BOT only.` : `Live on ${CHAIN.name}.`}</p>
           </div>
         </div>
       </section>

@@ -13,7 +13,7 @@ export function Footer() {
           <li><a className="hover:text-violet" href="https://botchain.ai" target="_blank" rel="noopener noreferrer">BOT Chain</a></li>
           <li><a className="hover:text-violet" href="https://scan.botchain.ai" target="_blank" rel="noopener noreferrer">BOT Scan</a></li>
           {QUILT_ADDRESS ? (
-            <li><a className="hover:text-violet" href={`${CHAIN.explorerUrl}/address/${QUILT_ADDRESS}`} target="_blank" rel="noopener noreferrer">Contract on testnet</a></li>
+            <li><a className="hover:text-violet" href={`${CHAIN.explorerUrl}/address/${QUILT_ADDRESS}`} target="_blank" rel="noopener noreferrer">{CHAIN.testnet ? "Contract on testnet" : "Contract"}</a></li>
           ) : null}
           <li><Link className="hover:text-violet" href="/create">Create a split</Link></li>
         </ul>

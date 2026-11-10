@@ -239,7 +239,9 @@ export function SplitClient() {
           )}
         </div>
 
-        <TxPanel state={state} onReset={reset} pendingLabel="Pending. Waiting for the block" doneLabel="Paid. Confirmed on-chain" />
+        <TxPanel state={state} onReset={reset} pendingLabel="Pending. Waiting for the block" doneLabel={verified === null ? "Confirmed. Verifying the receipt..." : verified.ok ? "Paid. Confirmed and verified on-chain" : "Confirmed on-chain, but the receipt didn't verify"}
+          doneTone={verified?.ok === false ? "warn" : "ok"}
+        />
 
         {confirmed && verified ? (
           verified.ok ? (

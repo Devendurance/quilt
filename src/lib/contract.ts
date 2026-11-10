@@ -49,7 +49,7 @@ export function describeError(err: unknown): { kind: "rejected" | "revert" | "ot
     [/InvalidRecipientCount/, "A split needs 2 to 5 recipients."],
     [/ZeroRecipientAddress/, "A recipient address is the zero address."],
     [/InvalidWeight/, "Every recipient needs a share above zero."],
-    [/insufficient funds/i, "Not enough tBOT to cover the amount plus gas."],
+    [/insufficient funds/i, `Not enough ${CHAIN.currency} to cover the amount plus gas.`],
   ];
   for (const [re, msg] of known) if (re.test(text)) return { kind: "revert", message: msg };
   return { kind: "other", message: e?.shortMessage ?? e?.message ?? "Something went wrong." };

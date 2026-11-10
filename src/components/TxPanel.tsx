@@ -3,7 +3,7 @@ import type { TxState } from "@/lib/hooks";
 import { txUrl } from "@/lib/chains";
 import { CHAIN_ID } from "@/lib/contract";
 
-export function TxPanel({ state, pendingLabel, doneLabel, onReset }: { state: TxState; pendingLabel: string; doneLabel: string; onReset: () => void }) {
+export function TxPanel({ state, pendingLabel, doneLabel, doneTone = "ok", onReset }: { state: TxState; pendingLabel: string; doneLabel: string; doneTone?: "ok" | "warn"; onReset: () => void }) {
   if (state.phase === "idle") return null;
   const link = "hash" in state && state.hash ? txUrl(CHAIN_ID, state.hash) : null;
   const base = "mt-6 rounded-[20px] border p-5 text-[15px] leading-6";
@@ -30,8 +30,8 @@ export function TxPanel({ state, pendingLabel, doneLabel, onReset }: { state: Tx
     );
   if (state.phase === "confirmed")
     return (
-      <div role="status" className={`${base} border-[#1a7f4b]/30 bg-white`}>
-        <p className="flex items-center gap-2 font-medium text-[#1a7f4b]"><CheckCircle2 size={18} /> {doneLabel}</p>
+      <div role="status" className={`${base} ${doneTone === "ok" ? "border-[#1a7f4b]/30" : "border-[#b42318]/30"} bg-white`}>
+        <p className={`flex items-center gap-2 font-medium ${doneTone === "ok" ? "text-[#1a7f4b]" : "text-[#b42318]"}`}><CheckCircle2 size={18} /> {doneLabel}</p>
         {hashLine}{explorer}
       </div>
     );
