@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "compile": "hardhat compile",
     "test:contracts": "hardhat test",
     "typecheck:contracts": "tsc -p tsconfig.hardhat.json --noEmit",
