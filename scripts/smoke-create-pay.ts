@@ -137,11 +137,6 @@ async function main() {
   const amount = 1_000_000_000_000_000n; // 0.001 tBOT
   const expected = [(amount * 6000n) / 10000n, (amount * 4000n) / 10000n];
 
-  const before = [
-    await publicClient.getBalance({ address: recipients[0] }),
-    await publicClient.getBalance({ address: recipients[1] }),
-  ];
-
   const createHash = await creatorClient.writeContract({
     address: contract,
     abi,
@@ -186,6 +181,13 @@ async function main() {
   if (quote.length !== 2 || quote[0] !== expected[0] || quote[1] !== expected[1]) {
     throw new Error(`quoteSplit mismatch: ${quote} vs expected ${expected}.`);
   }
+
+  // Snapshot AFTER createSplit: the creator is also recipient[0] and paid gas
+  // for creation, so pre-create balances would corrupt its payout delta.
+  const before = [
+    await publicClient.getBalance({ address: recipients[0] }),
+    await publicClient.getBalance({ address: recipients[1] }),
+  ];
 
   const payHash = await payerClient.writeContract({
     address: contract,
