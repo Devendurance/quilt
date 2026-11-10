@@ -1,7 +1,7 @@
 # left-off.md
 
 - Doing: 5-hour backend-first MVP, slices A-F in order.
-- Done: Slices A, B, C, D. Slice D frontend proven in browser on Bohr 968 (create, share, pay).
-- Next: Slice E (QA, mobile polish, adversarial checks), then F (mainnet) only if gates pass.
-- Issues: signing in the browser journey used the local dev signer, not MetaMask. Do a real MetaMask pass in Slice E.
-  Never force-push.
+- Done: A-D. Slice E hardening done in code (receipt verification, chain config, dev signer gating, tsconfig split, mobile fixes).
+- Blocked in E: real MetaMask/EIP-1193 extension QA. No wallet extension reachable from the agent, so the user must run the manual steps in README QA section of the report.
+- Next: user deploys site to Vercel (testnet), runs manual wallet QA, then Slice F (mainnet) only after BOT funding and gates.
+- Issues: ports 3000 and 3100 are used by other projects (wink, trail). Use 3210 for Quilt dev. Never force-push.

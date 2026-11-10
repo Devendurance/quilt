@@ -3,8 +3,7 @@ import Link from "next/link";
 import { usePublicClient } from "wagmi";
 import { useQuery } from "@tanstack/react-query";
 import { quiltAbi } from "@/lib/quilt-abi";
-import { CHAIN_ID, QUILT_ADDRESS, formatBot, shortAddr, type SplitView } from "@/lib/contract";
-import { BOHR_TESTNET } from "@/lib/chains";
+import { CHAIN, CHAIN_ID, QUILT_ADDRESS, formatBot, shortAddr, type SplitView } from "@/lib/contract";
 import { useQuiltWallet } from "@/lib/hooks";
 import { CopyButton } from "@/components/CopyButton";
 
@@ -42,7 +41,7 @@ export function DashboardClient() {
 
   return (
     <div className="rise mx-auto max-w-[1000px] px-5 pb-8 pt-4 md:px-12">
-      <p className="label text-stone">CREATOR DASHBOARD · {BOHR_TESTNET.name.toUpperCase()}</p>
+      <p className="label text-stone">CREATOR DASHBOARD · {CHAIN.name.toUpperCase()}</p>
       <h1 className="h2 mt-2">Your <b>splits.</b></h1>
 
       {!QUILT_ADDRESS ? (
@@ -63,7 +62,7 @@ export function DashboardClient() {
       ) : q.isError ? (
         <div className="glass mt-8 p-10 text-center" role="alert">
           <h2 className="h3">Couldn&apos;t load your splits</h2>
-          <p className="mt-3 text-slate">The Bohr RPC didn&apos;t answer. Your splits are safe on-chain.</p>
+          <p className="mt-3 text-slate">The {CHAIN.name} RPC didn&apos;t answer. Your splits are safe on-chain.</p>
           <div className="mt-6 flex justify-center"><button className="btn btn-primary" onClick={() => q.refetch()}>Try again</button></div>
         </div>
       ) : items.length === 0 ? (
@@ -76,7 +75,7 @@ export function DashboardClient() {
         <>
           <div className="mt-8 grid gap-4 sm:grid-cols-3">
             <div className="tile bg-white"><p className="label text-stone">SPLITS</p><p className="numeral mt-1 text-[40px] leading-[44px]">{items.length}</p></div>
-            <div className="tile bg-[#d9ccf5]"><p className="label text-slate">TOTAL PAID</p><p className="numeral mt-1 text-[40px] leading-[44px]" data-testid="dash-total">{formatBot(totalPaid, 8)}</p><p className="label text-slate">{BOHR_TESTNET.currency}</p></div>
+            <div className="tile bg-[#d9ccf5]"><p className="label text-slate">TOTAL PAID</p><p className="numeral mt-1 text-[40px] leading-[44px]" data-testid="dash-total">{formatBot(totalPaid, 8)}</p><p className="label text-slate">{CHAIN.currency}</p></div>
             <div className="tile bg-violet text-white"><p className="label text-white/80">PAYMENTS</p><p className="numeral mt-1 text-[40px] leading-[44px]" data-testid="dash-count">{totalCount.toString()}</p></div>
           </div>
           <ul className="mt-6 space-y-4">
@@ -87,7 +86,7 @@ export function DashboardClient() {
                   <p className="label text-stone">{split.recipients.length} recipients</p>
                 </div>
                 <div className="flex gap-8">
-                  <div><p className="label text-stone">PAID</p><p className="numeral text-[20px]">{formatBot(split.totalPaid, 8)} {BOHR_TESTNET.currency}</p></div>
+                  <div><p className="label text-stone">PAID</p><p className="numeral text-[20px]">{formatBot(split.totalPaid, 8)} {CHAIN.currency}</p></div>
                   <div><p className="label text-stone">PAYMENTS</p><p className="numeral text-[20px]">{split.paymentCount.toString()}</p></div>
                 </div>
                 <div className="flex gap-2">

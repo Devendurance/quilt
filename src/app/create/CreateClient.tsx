@@ -1,11 +1,13 @@
 "use client";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { isAddress, parseEventLogs } from "viem";
+import { isAddress } from "viem";
+import { usePublicClient, useBalance } from "wagmi";
+import { useQuery } from "@tanstack/react-query";
+import { balanceCheck, splitIdFromCreateReceipt, splitMatches } from "@/lib/receipt";
 import { Plus, Trash2 } from "lucide-react";
 import { quiltAbi } from "@/lib/quilt-abi";
-import { QUILT_ADDRESS, bpsToPercent, describeError, shortAddr } from "@/lib/contract";
-import { BOHR_TESTNET } from "@/lib/chains";
+import { CHAIN, CHAIN_ID, formatBot, type SplitView, QUILT_ADDRESS, WRITES_ENABLED, WRITES_DISABLED_REASON, bpsToPercent, describeError, shortAddr } from "@/lib/contract";
 import { useQuiltTx, useQuiltWallet } from "@/lib/hooks";
 import { TxPanel } from "@/components/TxPanel";
 import { CopyButton } from "@/components/CopyButton";
@@ -31,6 +33,9 @@ export function CreateClient() {
   const [reviewing, setReviewing] = useState(false);
   const [ack, setAck] = useState(false);
   const [newId, setNewId] = useState<bigint | null>(null);
+  const [verifyError, setVerifyError] = useState<string | null>(null);
+  const publicClient = usePublicClient({ chainId: CHAIN_ID });
+  const { data: balance } = useBalance({ address: wallet.address, chainId: CHAIN_ID, query: { enabled: !!wallet.address } });
 
   const check = useMemo(() => {
     const bps = rows.map((r) => toBps(r.percent));
@@ -53,6 +58,29 @@ export function CreateClient() {
     return { bps: bps as number[], total, rowErrors, ok };
   }, [rows]);
 
+  const canEstimate = reviewing && check.ok && wallet.isConnected && !wallet.wrongNetwork && !!publicClient && !!QUILT_ADDRESS;
+  const feeQ = useQuery({
+    queryKey: ["create-fee", rows.map((r) => r.address.trim().toLowerCase()).join(","), check.bps.join(","), wallet.address],
+    enabled: canEstimate,
+    retry: false,
+    queryFn: async () => {
+      const [gas, price] = await Promise.all([
+        publicClient!.estimateContractGas({
+          address: QUILT_ADDRESS!,
+          abi: quiltAbi,
+          functionName: "createSplit",
+          args: [rows.map((r) => r.address.trim() as `0x${string}`), check.bps],
+          account: wallet.address!,
+        }),
+        publicClient!.getGasPrice(),
+      ]);
+      return gas * price;
+    },
+  });
+  const fee = feeQ.isSuccess ? feeQ.data : null;
+  const bal = balance && canEstimate ? balanceCheck(balance.value, 0n, fee) : null;
+  const lowBalance = !!bal && !bal.ok;
+
   const update = (i: number, patch: Partial<Row>) => setRows((rs) => rs.map((r, j) => (j === i ? { ...r, ...patch } : r)));
   const evenly = () =>
     setRows((rs) => {
@@ -65,6 +93,7 @@ export function CreateClient() {
   const remaining = 10000 - check.total;
 
   async function create() {
+    setVerifyError(null);
     const receipt = await run({
       address: QUILT_ADDRESS!,
       abi: quiltAbi as never,
@@ -72,8 +101,22 @@ export function CreateClient() {
       args: [rows.map((r) => r.address.trim() as `0x${string}`), check.bps],
     });
     if (receipt) {
-      const ev = parseEventLogs({ abi: quiltAbi, eventName: "SplitCreated", logs: receipt.logs });
-      setNewId(ev[0]?.args.splitId ?? null);
+      // Only logs from the canonical contract count. Then confirm against chain state.
+      const id = splitIdFromCreateReceipt(receipt.logs, QUILT_ADDRESS!, wallet.address!);
+      if (id === null) {
+        setVerifyError("The receipt had no SplitCreated event from the Quilt contract for your wallet.");
+        return;
+      }
+      try {
+        const stored = (await publicClient!.readContract({ address: QUILT_ADDRESS!, abi: quiltAbi, functionName: "getSplit", args: [id] })) as SplitView;
+        if (!splitMatches(stored, { creator: wallet.address!, recipients: rows.map((r) => r.address.trim()), weightsBps: check.bps })) {
+          setVerifyError(`Split #${id} exists but doesn't match what you submitted. Check it on the explorer.`);
+          return;
+        }
+        setNewId(id);
+      } catch {
+        setVerifyError("The split was created but couldn't be read back. Find it in your dashboard.");
+      }
     }
   }
 
@@ -81,7 +124,7 @@ export function CreateClient() {
     return (
       <div className="glass mx-auto my-8 max-w-[760px] p-10 text-center" role="alert">
         <h1 className="h3">Contract not configured</h1>
-        <p className="mt-3 text-slate">This build has no QuiltSplits address for Bohr testnet, so it refuses to guess one.</p>
+        <p className="mt-3 text-slate">{WRITES_DISABLED_REASON} This build refuses to guess an address.</p>
       </div>
     );
 
@@ -107,7 +150,7 @@ export function CreateClient() {
 
   return (
     <div className="rise mx-auto max-w-[760px] px-5 pb-8 pt-4 md:px-0">
-      <p className="label text-stone">NEW SPLIT · {BOHR_TESTNET.name.toUpperCase()}</p>
+      <p className="label text-stone">NEW SPLIT · {CHAIN.name.toUpperCase()}</p>
       <h1 className="h2 mt-2">Create a <b>split.</b></h1>
       <p className="mt-4 text-slate">Add 2 to 5 recipients and give each a share. Shares must total exactly 100%.</p>
 
@@ -181,6 +224,13 @@ export function CreateClient() {
               <span>I understand these recipients and shares are permanent. No one, including me, can change or delete them.</span>
             </label>
 
+            {!WRITES_ENABLED ? <p className="mt-4 rounded-[14px] bg-black/[0.04] p-3 text-[15px] text-slate" role="status">{WRITES_DISABLED_REASON}</p> : null}
+            {canEstimate ? (
+              <p className="label mt-4 text-slate">
+                Estimated network fee: {feeQ.isSuccess ? `${formatBot(feeQ.data, 8)} ${CHAIN.currency}` : feeQ.isError ? "unavailable. Your wallet will show the real fee" : "estimating..."}.
+              </p>
+            ) : null}
+            {lowBalance ? <p className="mt-2 text-[15px] text-[#b42318]" role="alert">Your balance is {formatBot(balance!.value, 8)} {CHAIN.currency}, which doesn&apos;t cover the estimated network fee.</p> : null}
             <div className="mt-6">
               {!wallet.mounted ? null : !wallet.isConnected ? (
                 <div>
@@ -190,19 +240,19 @@ export function CreateClient() {
                 </div>
               ) : wallet.wrongNetwork ? (
                 <div>
-                  <button className="btn btn-primary" onClick={wallet.switchNetwork} disabled={wallet.switching}>{wallet.switching ? "Switching..." : "Switch to Bohr testnet"}</button>
+                  <button className="btn btn-primary" onClick={wallet.switchNetwork} disabled={wallet.switching}>{wallet.switching ? "Switching..." : `Switch to ${CHAIN.name}`}</button>
                   {wallet.switchError ? <p className="mt-2 text-[15px] text-[#b42318]" role="alert">{describeError(wallet.switchError).message}</p> : null}
                 </div>
               ) : (
                 <div className="flex flex-wrap gap-3">
-                  <button className="btn btn-primary" onClick={create} disabled={!ack || busy}>{busy ? "Creating..." : "Create split permanently"}</button>
+                  <button className="btn btn-primary" onClick={create} disabled={!ack || busy || !WRITES_ENABLED || lowBalance}>{busy ? "Creating..." : "Create split permanently"}</button>
                   <button className="btn btn-ghost" onClick={() => { setReviewing(false); setAck(false); reset(); }} disabled={busy}>Back to edit</button>
                 </div>
               )}
             </div>
             <TxPanel state={state} onReset={reset} pendingLabel="Pending. Waiting for the block" doneLabel="Confirmed. Reading your new split id" />
-            {state.phase === "confirmed" && newId === null ? (
-              <p className="mt-3 text-[15px] text-slate" role="alert">The split was created, but the id wasn&apos;t in the receipt. Find it in your <Link className="font-medium text-violet" href="/dashboard">dashboard</Link>.</p>
+            {verifyError ? (
+              <p className="mt-3 text-[15px] text-[#b42318]" role="alert">{verifyError} <Link className="font-medium text-violet" href="/dashboard">Open dashboard</Link></p>
             ) : null}
           </div>
         </div>

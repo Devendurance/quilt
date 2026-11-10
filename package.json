@@ -9,7 +9,9 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "compile": "hardhat compile",
-    "test:contracts": "hardhat test"
+    "test:contracts": "hardhat test",
+    "typecheck:contracts": "tsc -p tsconfig.hardhat.json --noEmit",
+    "check:prod-bundle": "node scripts/check-prod-bundle.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

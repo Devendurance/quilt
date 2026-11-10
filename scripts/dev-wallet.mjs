@@ -7,6 +7,7 @@
 //
 // Usage: node scripts/dev-wallet.mjs   (then set NEXT_PUBLIC_DEV_WALLET_URL=http://127.0.0.1:8545)
 import "dotenv/config";
+if (process.env.NODE_ENV === "production" || process.env.VERCEL) throw new Error("dev wallet refuses to run in production");
 import http from "node:http";
 import { createWalletClient, http as viemHttp, defineChain } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
@@ -25,6 +26,7 @@ const clients = Object.fromEntries(Object.entries(accounts).map(([r, a]) => [r, 
 const READ = new Set(["eth_call", "eth_estimateGas", "eth_getBalance", "eth_blockNumber", "eth_getTransactionReceipt", "eth_getTransactionByHash", "eth_gasPrice", "eth_getBlockByNumber", "eth_getCode", "eth_getTransactionCount", "eth_feeHistory", "eth_maxPriorityFeePerGas", "net_version"]);
 
 const providerJs = `(() => {
+  if (!["localhost", "127.0.0.1"].includes(location.hostname)) return;
   const BRIDGE = ${JSON.stringify(`http://127.0.0.1:${PORT}`)};
   const role = () => { try { return localStorage.getItem("quilt-dev-role") || "deployer"; } catch { return "deployer"; } };
   const rejectNext = () => { try { return localStorage.getItem("quilt-dev-reject") === "1"; } catch { return false; } };
@@ -60,7 +62,9 @@ http
     if (req.method === "OPTIONS") return send(res, 204, "");
     if (url.pathname === "/provider.js") return send(res, 200, providerJs, "text/javascript");
     if (url.pathname !== "/rpc" || req.method !== "POST") return send(res, 404, "{}");
-    if (req.headers.origin && req.headers.origin !== ORIGIN) return send(res, 403, JSON.stringify({ error: { code: -32000, message: "origin not allowed" } }));
+    // Reject DNS rebinding and any caller that is not the local app.
+    if (!/^(127\.0\.0\.1|localhost):\d+$/.test(req.headers.host ?? "")) return send(res, 403, "{}");
+    if (req.headers.origin !== ORIGIN) return send(res, 403, JSON.stringify({ error: { code: -32000, message: "origin not allowed" } }));
     const role = url.searchParams.get("role") === "payer" ? "payer" : "deployer";
     let raw = "";
     for await (const c of req) raw += c;

@@ -1,13 +1,17 @@
-import { BOHR_TESTNET } from "./chains";
-import { getQuiltContractAddress } from "./quilt-addresses";
+import { resolveNetwork } from "./network";
 
-export const CHAIN_ID = BOHR_TESTNET.id;
-
-// Next inlines NEXT_PUBLIC_ vars only for literal access, so read it here.
-const raw = process.env.NEXT_PUBLIC_QUILT_CONTRACT_ADDRESS_968;
-export const QUILT_ADDRESS = /^0x[0-9a-fA-F]{40}$/.test(raw ?? "")
-  ? (raw as `0x${string}`)
-  : getQuiltContractAddress(CHAIN_ID);
+// Next inlines NEXT_PUBLIC_ vars only for literal property access.
+export const NETWORK = resolveNetwork({
+  network: process.env.NEXT_PUBLIC_QUILT_NETWORK,
+  addr968: process.env.NEXT_PUBLIC_QUILT_CONTRACT_ADDRESS_968,
+  addr677: process.env.NEXT_PUBLIC_QUILT_CONTRACT_ADDRESS_677,
+  mainnetWrites: process.env.NEXT_PUBLIC_QUILT_MAINNET_WRITES,
+});
+export const CHAIN = NETWORK.chain;
+export const CHAIN_ID = CHAIN.id;
+export const QUILT_ADDRESS = NETWORK.address;
+export const WRITES_ENABLED = NETWORK.writesEnabled;
+export const WRITES_DISABLED_REASON = NETWORK.writesDisabledReason;
 
 export type SplitView = {
   creator: `0x${string}`;

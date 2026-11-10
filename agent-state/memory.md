@@ -14,3 +14,6 @@
 - Bohr has no multicall3 (eth_getCode empty). Dashboard does one read per split.
 - Satoshi has no 600 weight: never use font-semibold. `next dev` rewrites AGENTS.md, so agentRules:false is set in next.config.ts.
 - Heredocs with apostrophes in JSX can break the bash tool. Use the Write tool for TSX files.
+- Vercel failed on 4a762a4 because tsconfig included contracts tests. Fixed by narrowing include to src and adding ts-node commonjs override in tsconfig.json. Never use ignoreBuildErrors.
+- Clean-install build verified (npm ci, no hardhat artifacts, no .env). check:prod-bundle proves no dev signer in .next even with NEXT_PUBLIC_DEV_WALLET_URL set.
+- Slice E extra browser pay tx (dev signer, verified receipt UI): 0x5fb03fdf0b56b897962ceb3e987baac02cbd790a3f4d8802a9d748b003b74b65 on split 3.

@@ -13,8 +13,11 @@ export const metadata: Metadata = {
   description: "Immutable native BOT split payments on BOT Chain. One transaction pays every recipient their exact share.",
 };
 
-// Dev-only local test signer. Unset in any normal build, so nothing loads.
-const devWallet = process.env.NEXT_PUBLIC_DEV_WALLET_URL;
+// Dev-only local test signer. The NODE_ENV check is inlined at build time, so a
+// production build drops this branch even if the env var is set by mistake.
+// The URL must also be a loopback address.
+const devWalletRaw = process.env.NODE_ENV === "development" ? process.env.NEXT_PUBLIC_DEV_WALLET_URL : undefined;
+const devWallet = devWalletRaw && /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(devWalletRaw) ? devWalletRaw : undefined;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (

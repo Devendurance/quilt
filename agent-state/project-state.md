@@ -10,3 +10,5 @@
 - Slice D done: routes /, /create, /s/[splitId], /dashboard. wagmi injected connector, chain 968 only,
   direct contract reads/simulate/write, no eth_getLogs (id from receipt logs), no DB.
   Dev signer: scripts/dev-wallet.mjs, enabled only via NEXT_PUBLIC_DEV_WALLET_URL.
+- Slice E: src/lib/network.ts (env-driven 968/677, no fallback, mainnet writes off), src/lib/receipt.ts (canonical-address log filtering, payout verification),
+  tsconfig.json frontend-only, tsconfig.hardhat.json for contracts/tests. contracts/test/frontend/ holds regression tests (38 tests total with the 24 contract tests).

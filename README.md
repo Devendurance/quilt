@@ -20,11 +20,26 @@ Mainnet RPC disables `eth_getLogs`: dashboards read on-chain views
 npm install
 npm run dev        # frontend
 npx hardhat compile
-npx hardhat test   # contract suite (Slice B adds it)
+npx hardhat test   # 24 contract tests + frontend integrity tests
+npm run typecheck && npm run typecheck:contracts && npm run lint && npm run build
 ```
 
-Copy `.env.example` to `.env` for local deploys. Contract addresses stay empty
-until a verified deploy writes them; the app fails closed when unset.
+Copy `.env.example` to `.env` for local deploys. The app fails closed when a
+contract address is unset. The Bohr testnet address defaults from
+`deployments/968.json`. Mainnet (677) never falls back to it.
+
+## Deploying the website (Vercel, Bohr testnet)
+
+- Framework: Next.js. Install: `npm ci`. Build: `npm run build`. Root: repo root.
+- Env (all public, no secrets): `NEXT_PUBLIC_QUILT_NETWORK=968` and
+  `NEXT_PUBLIC_QUILT_CONTRACT_ADDRESS_968=0xdc7effbb316a9a194c2779d33d28d0fa3347fb7e`
+  (both optional, these are the defaults).
+- Never set `DEPLOYER_PRIVATE_KEY`, `PAYER_PRIVATE_KEY` or `NEXT_PUBLIC_DEV_WALLET_URL` on Vercel.
+  The dev signer only loads when `NODE_ENV` is `development`, and `npm run check:prod-bundle` verifies a build.
+- Mainnet writes stay off until Slice F: `NEXT_PUBLIC_QUILT_NETWORK=677` needs its own
+  `NEXT_PUBLIC_QUILT_CONTRACT_ADDRESS_677` and `NEXT_PUBLIC_QUILT_MAINNET_WRITES=true`.
+- The frontend tsconfig covers `src/` only. Contract and test types live in `tsconfig.hardhat.json`
+  (`npm run typecheck:contracts`), so a Vercel build needs no Hardhat artifacts.
 
 ## Repo layout
 

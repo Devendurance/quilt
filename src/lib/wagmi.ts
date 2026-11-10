@@ -1,20 +1,20 @@
 import { createConfig, http } from "wagmi";
 import { injected } from "wagmi/connectors";
 import { defineChain } from "viem";
-import { BOHR_TESTNET } from "./chains";
+import { CHAIN } from "./contract";
 
-export const bohr = defineChain({
-  id: BOHR_TESTNET.id,
-  name: BOHR_TESTNET.name,
-  nativeCurrency: { name: "Bohr test BOT", symbol: BOHR_TESTNET.currency, decimals: 18 },
-  rpcUrls: { default: { http: [BOHR_TESTNET.rpcUrl] } },
-  blockExplorers: { default: { name: "BOT Scan", url: BOHR_TESTNET.explorerUrl } },
-  testnet: true,
+export const activeChain = defineChain({
+  id: CHAIN.id,
+  name: CHAIN.name,
+  nativeCurrency: { name: CHAIN.testnet ? "Bohr test BOT" : "BOT", symbol: CHAIN.currency, decimals: 18 },
+  rpcUrls: { default: { http: [CHAIN.rpcUrl] } },
+  blockExplorers: { default: { name: "BOT Scan", url: CHAIN.explorerUrl } },
+  testnet: CHAIN.testnet,
 });
 
 export const wagmiConfig = createConfig({
-  chains: [bohr],
+  chains: [activeChain],
   connectors: [injected()],
-  transports: { [bohr.id]: http(BOHR_TESTNET.rpcUrl) },
+  transports: { [activeChain.id]: http(CHAIN.rpcUrl) },
   ssr: true,
 });

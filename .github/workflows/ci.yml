@@ -20,4 +20,6 @@ jobs:
       - run: npx hardhat test
       - run: npm run lint
       - run: npm run typecheck
-      - run: npm run build
+      - run: npm run typecheck:contracts
+      - run: NEXT_PUBLIC_DEV_WALLET_URL=http://127.0.0.1:8545 npm run build
+      - run: npm run check:prod-bundle

@@ -3,7 +3,7 @@
 Real deployment evidence lives here. Each file is written by its slice from actual
 execution output, never hand-filled.
 
-- `968.json` (Slice C): Bohr testnet contract address, deployment tx, create/pay txs,
+- `968.json` (Slice C, also the source of the frontend default testnet address): Bohr testnet contract address, deployment tx, create/pay txs,
   recipient balance deltas, chain ID, compiler settings, ABI reference, timestamps.
 - `677.json` (Slice F): same shape for BOT Chain mainnet, only after security gates pass.
 

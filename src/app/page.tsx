@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Layers, Link2, ShieldCheck, Zap } from "lucide-react";
 import { HeroCapsule } from "@/components/HeroCapsule";
 import { LiveCount } from "@/components/LiveCount";
+import { CHAIN } from "@/lib/contract";
 
 function Sphere({ className, style }: { className: string; style: React.CSSProperties }) {
   return (
@@ -15,7 +16,7 @@ function Sphere({ className, style }: { className: string; style: React.CSSPrope
 
 function HeroObject() {
   return (
-    <div aria-hidden className="pointer-events-none absolute right-[-6%] top-[-40px] hidden h-[640px] w-[560px] md:block lg:right-[2%]">
+    <div aria-hidden className="pointer-events-none absolute right-[-6%] top-[-40px] hidden h-[640px] w-[560px] lg:block lg:right-[2%]">
       <div className="float-a absolute left-[90px] top-[60px] h-[470px] w-[300px]" style={{ transform: "rotateX(-12deg) rotateZ(18deg)", transformOrigin: "50% 100%" }}>
         <div className="h-full w-full rounded-[32px]" style={{ background: "rgba(255,255,255,.55)", border: "1.5px solid rgba(255,255,255,.9)", backdropFilter: "blur(20px)", boxShadow: "0 30px 60px rgba(94,63,214,.12)" }} />
         <div className="absolute left-8 right-8 top-10 space-y-3">
@@ -59,7 +60,7 @@ export default function Home() {
               <Link href="/create" className="btn btn-primary">Create a split</Link>
               <Link href="/dashboard" className="btn btn-ghost">Your dashboard</Link>
             </div>
-            <p className="label mt-5 text-stone">Live on BOT Chain testnet (Bohr). Test BOT only.</p>
+            <p className="label mt-5 text-stone">{CHAIN.testnet ? `Live on ${CHAIN.name} (chain ${CHAIN.id}). Test BOT only.` : `Live on ${CHAIN.name}.`}</p>
           </div>
         </div>
       </section>
@@ -99,7 +100,7 @@ export default function Home() {
           <div className="tile bg-[#c9d3dc] md:col-span-6 md:min-h-[200px]">
             <span className="label inline-block" style={{ transform: "rotate(-4deg)" }}>ON-CHAIN NOW</span>
             <p className="numeral mt-4 text-[40px] leading-[44px]"><LiveCount /></p>
-            <p className="mt-1 text-slate">splits created on Bohr testnet</p>
+            <p className="mt-1 text-slate">splits created on {CHAIN.name}</p>
           </div>
           <div className="tile bg-[#f7dccb] md:col-span-6 md:min-h-[200px]">
             <span className="label inline-block" style={{ transform: "rotate(-4deg)" }}>FEES</span>
@@ -111,7 +112,7 @@ export default function Home() {
 
       <section className="mx-auto mt-[120px] max-w-[1200px] px-5 text-center md:px-12">
         <h2 className="h2"><b>Ready</b> <span className="font-light">to split?</span></h2>
-        <p className="mx-auto mt-4 max-w-[460px] text-slate">Connect a wallet on Bohr testnet and create your first split in under a minute.</p>
+        <p className="mx-auto mt-4 max-w-[460px] text-slate">Connect a wallet on {CHAIN.name} and create your first split in under a minute.</p>
         <div className="mt-8 flex justify-center"><Link href="/create" className="btn btn-primary">Create a split</Link></div>
       </section>
     </>

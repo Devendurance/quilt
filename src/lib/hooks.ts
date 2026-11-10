@@ -2,8 +2,7 @@
 import { useCallback, useState, useSyncExternalStore } from "react";
 import { useAccount, useConnect, useDisconnect, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
 import type { Abi, Hash, TransactionReceipt } from "viem";
-import { CHAIN_ID } from "./contract";
-import { describeError } from "./contract";
+import { CHAIN, CHAIN_ID, WRITES_DISABLED_REASON, WRITES_ENABLED, describeError } from "./contract";
 
 const noop = () => () => {};
 export function useMounted() {
@@ -62,8 +61,18 @@ export function useQuiltTx() {
         setState({ phase: "failed", message: "Wallet is not ready. Reconnect and try again." });
         return null;
       }
+      if (!WRITES_ENABLED) {
+        setState({ phase: "failed", message: WRITES_DISABLED_REASON ?? "Writes are disabled." });
+        return null;
+      }
       let hash: Hash | undefined;
       try {
+        // Never send to a contract through a wallet that is on a different chain.
+        const walletChain = await walletClient.getChainId();
+        if (walletChain !== CHAIN_ID) {
+          setState({ phase: "failed", message: `Your wallet is on chain ${walletChain}. Switch to ${CHAIN.name} (${CHAIN_ID}) and try again.` });
+          return null;
+        }
         setState({ phase: "awaiting" });
         const { request } = await publicClient.simulateContract({ ...w, account: address } as never);
         hash = await walletClient.writeContract(request as never);

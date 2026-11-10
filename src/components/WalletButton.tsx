@@ -1,6 +1,6 @@
 "use client";
 import { Wallet } from "lucide-react";
-import { shortAddr } from "@/lib/contract";
+import { CHAIN, shortAddr } from "@/lib/contract";
 import { useQuiltWallet } from "@/lib/hooks";
 
 export function WalletButton() {
@@ -17,7 +17,7 @@ export function WalletButton() {
     <div className="flex items-center gap-2">
       {w.wrongNetwork ? (
         <button className="btn btn-primary btn-sm" onClick={w.switchNetwork} disabled={w.switching}>
-          {w.switching ? "Switching..." : "Switch to Bohr"}
+          {w.switching ? "Switching..." : `Switch to ${CHAIN.name}`}
         </button>
       ) : null}
       <button className="btn btn-dark btn-sm numeral" onClick={() => w.disconnect()} title="Disconnect" aria-label="Disconnect wallet">
