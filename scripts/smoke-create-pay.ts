@@ -9,6 +9,7 @@ import {
   type TransactionReceipt,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
+import hre from "hardhat";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import type { PublicClient } from "viem";
 
@@ -29,7 +30,6 @@ function readAddressEnv(name: "QUILT_CONTRACT_968"): Address | null {
 }
 
 async function readQuiltArtifact() {
-  const hre = await import("hardhat");
   return hre.artifacts.readArtifact("QuiltSplits");
 }
 
@@ -225,8 +225,9 @@ async function main() {
   if (delta0 !== expected[0]) {
     throw new Error(`Creator delta ${delta0} != expected ${expected[0]}.`);
   }
-  if (delta1 + gasCost !== expected[1]) {
-    throw new Error(`Payer delta+gas ${delta1 + gasCost} != expected ${expected[1]}.`);
+  // The payer also funds the payment value, so its net delta is share - amount - gas.
+  if (delta1 + gasCost + amount !== expected[1]) {
+    throw new Error(`Payer delta+gas+amount ${delta1 + gasCost + amount} != expected ${expected[1]}.`);
   }
   if ((await publicClient.getBalance({ address: contract })) !== 0n) {
     throw new Error("Residual balance left in contract after pay.");
@@ -295,7 +296,7 @@ async function main() {
     payer: payer.address,
     recipients: [
       { address: recipients[0], bps: 6000, expectedWei: expected[0].toString(), actualWei: delta0.toString() },
-      { address: recipients[1], bps: 4000, expectedWei: expected[1].toString(), actualWei: (delta1 + gasCost).toString() },
+      { address: recipients[1], bps: 4000, expectedWei: expected[1].toString(), actualWei: (delta1 + gasCost + amount).toString() },
     ],
     createTx: createHash,
     createBlock: Number(createReceipt.blockNumber),
@@ -320,7 +321,7 @@ async function main() {
         createTx: createHash,
         payTx: payHash,
         expectedWei: expected.map(String),
-        actualWei: [delta0.toString(), (delta1 + gasCost).toString()],
+        actualWei: [delta0.toString(), (delta1 + gasCost + amount).toString()],
         totalPaidWei: counters.totalPaid.toString(),
         paymentCount: counters.paymentCount.toString(),
       },

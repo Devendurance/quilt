@@ -1,0 +1,44 @@
+{
+  "chainId": 968,
+  "contract": "0xdc7effbb316a9a194c2779d33d28d0fa3347fb7e",
+  "deployer": "0x374A94C75BD463635Cc6C96141B0EF31aCd02EF3",
+  "deployTx": "0xc0654cff462fdc3c9ed1181122bab4f6f1d1582a8cbc9cf8fa1d11aeb0737a39",
+  "deployBlock": 29950345,
+  "compiler": {
+    "version": "0.8.28",
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    }
+  },
+  "abiRef": "deployments/QuiltSplits.abi.json",
+  "deployedAt": "2026-11-10T14:50:43.548Z",
+  "splitId": "2",
+  "creator": "0x374A94C75BD463635Cc6C96141B0EF31aCd02EF3",
+  "payer": "0xD691aE1F1700cec7DDcAcF0e5ECBf276D0ac0d03",
+  "recipients": [
+    {
+      "address": "0x374A94C75BD463635Cc6C96141B0EF31aCd02EF3",
+      "bps": 6000,
+      "expectedWei": "600000000000000",
+      "actualWei": "600000000000000"
+    },
+    {
+      "address": "0xD691aE1F1700cec7DDcAcF0e5ECBf276D0ac0d03",
+      "bps": 4000,
+      "expectedWei": "400000000000000",
+      "actualWei": "400000000000000"
+    }
+  ],
+  "createTx": "0x4f469ebabeac59f128ec0f4500bdf0b6f887c5ae56b4b621cf4fb12597a2fde7",
+  "createBlock": 29950506,
+  "payTx": "0x02d01b2eaad7e77b5d3b22ff5ff91c5d4e4ba5cf1edd9bc4d1f11c8c101c0e3a",
+  "payBlock": 29950511,
+  "payAmountWei": "1000000000000000",
+  "payGasWei": "2111980000000000",
+  "txStatus": "success",
+  "totalPaidWei": "1000000000000000",
+  "paymentCount": "1",
+  "revertCheck": "zero-value pay simulation reverted; counters unchanged",
+  "provenAt": "2026-11-10T14:52:50.313Z"
+}

@@ -6,4 +6,4 @@
 - Architecture: direct-to-contract frontend, no custody backend; views over eth_getLogs (disabled on mainnet RPC).
 - Slice A baseline done 2026-11-10. Slice B done: QuiltSplits (2-5 recipients, 10000 bps,
   nonReentrant atomic pay, dust rejection, no fees/admin) + 24 Hardhat tests green.
-- Next: Slice C live execution (needs funded Bohr keys); then Slice D frontend.
+- Next: Slice D frontend on the proven 968 contract (fresh session).

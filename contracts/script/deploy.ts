@@ -5,6 +5,7 @@ import {
   http,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
+import hre from "hardhat";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import type { Address, PublicClient } from "viem";
 
@@ -20,7 +21,6 @@ function requireKey(name: "DEPLOYER_PRIVATE_KEY"): `0x${string}` {
 }
 
 async function readQuiltArtifact() {
-  const hre = await import("hardhat");
   return hre.artifacts.readArtifact("QuiltSplits");
 }
 
